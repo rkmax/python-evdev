@@ -129,9 +129,6 @@ class UInput(EventIO):
         # Prepare the list of events for passing to _uinput.enable and _uinput.setup.
         absinfo, prepared_events = self._prepare_events(events)
 
-        # Set phys name
-        _uinput.set_phys(self.fd, phys)
-
         # Set properties
         input_props = input_props or []
         for prop in input_props:
@@ -140,10 +137,15 @@ class UInput(EventIO):
         for etype, code in prepared_events:
             _uinput.enable(self.fd, etype, code)
 
+        print('setup device')
         _uinput.setup(self.fd, name, vendor, product, version, bustype, absinfo)
 
+        print('create device')
         # Create the uinput device.
         _uinput.create(self.fd)
+
+        # Set phys name
+        _uinput.set_phys(self.fd, phys)
 
         self.dll = ctypes.CDLL(_uinput.__file__)
         self.dll._uinput_begin_upload.restype = ctypes.c_int
